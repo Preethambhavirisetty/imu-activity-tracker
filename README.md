@@ -1,104 +1,73 @@
-# Smart IMU-Based Orientation & Activity Tracker
+# 🧭 Smart IMU Orientation & Activity Tracker
 
-A clean Python project for learning and prototyping an IMU-based motion tracker with:
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?logo=numpy&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c)
+![Ruff](https://img.shields.io/badge/lint-ruff-D7FF64)
+![mypy](https://img.shields.io/badge/types-mypy_strict-2A6DB2)
 
-- Raw accelerometer and gyroscope ingestion
-- Low-pass and high-pass signal filtering
-- Madgwick sensor fusion for real-time orientation
-- Activity detection for idle, walking, running, falling, and gestures
-- 3D orientation visualization with Matplotlib
-- Simulated IMU stream for development without hardware
-- Optional serial input for MPU6050 / LSM6DSOX firmware output
+Turns raw accelerometer and gyroscope data into real-time orientation and activity labels. Works with a simulated stream or a microcontroller (MPU6050 / LSM6DSOX) over serial.
 
-## Project Layout
+## Features
+- Raw accel/gyro ingestion from a simulated source or a serial CSV stream
+- Low-pass and high-pass filtering
+- Madgwick sensor fusion for orientation
+- Activity detection: idle, walking, running, falling, gestures
+- Live 3D orientation view with Matplotlib
+- `imu-tracker` CLI; pytest tests; ruff + strict mypy config
 
-```text
+## Screenshot
+<!-- Add a GIF of the 3D visualization: docs/demo.gif -->
+![Demo](docs/demo.gif)
+
+## Tech stack
+Python 3.10+ · NumPy · Matplotlib · pyserial · pytest · ruff · mypy
+
+## Project structure
+```
 .
-├── pyproject.toml
-├── README.md
-├── examples/
-│   └── sample_serial_format.csv
-├── src/
-│   └── imu_tracker/
-│       ├── __main__.py
-│       ├── activity.py
-│       ├── cli.py
-│       ├── config.py
-│       ├── filters.py
-│       ├── fusion.py
-│       ├── models.py
-│       ├── pipeline.py
-│       ├── sources.py
-│       └── visualization.py
-└── tests/
-    ├── test_activity.py
-    ├── test_filters.py
-    └── test_fusion.py
+├── src/imu_tracker/
+│   ├── cli.py, __main__.py   # imu-tracker CLI
+│   ├── sources.py            # simulated + serial sources
+│   ├── filters.py            # low/high-pass filters
+│   ├── fusion.py             # Madgwick filter
+│   ├── activity.py           # activity detection
+│   ├── pipeline.py, models.py, config.py
+│   └── visualization.py      # 3D orientation plot
+├── examples/sample_serial_format.csv
+├── tests/                    # test_activity, test_filters, test_fusion
+└── pyproject.toml
 ```
 
-## Quick Start
-
-Create an environment and install the package:
-
+## Getting started
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+git clone https://github.com/Preethambhavirisetty/imu-activity-tracker.git
+cd imu-activity-tracker
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-```
 
-Run a simulated real-time tracker:
-
-```bash
-imu-tracker simulate --duration 20 --visualize
-```
-
-Run without visualization and print activity/orientation:
-
-```bash
-imu-tracker simulate --duration 10
-```
-
-Use serial input from a microcontroller:
-
-```bash
+imu-tracker simulate --duration 20 --visualize   # simulated, with 3D view
+imu-tracker simulate --duration 10               # print-only
 imu-tracker serial --port /dev/tty.usbmodem1101 --baud 115200 --visualize
 ```
+Serial format: `timestamp,accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z` (accel in g, gyro in deg/s).
 
-Expected serial line format:
-
-```csv
-timestamp,accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z
-```
-
-Accelerometer units are `g`; gyroscope units are `deg/s`.
-
-## Hardware Notes
-
-For an MPU6050 or LSM6DSOX, your firmware should:
-
-1. Configure accelerometer range, for example `+-2g` or `+-4g`.
-2. Configure gyroscope range, for example `+-250 dps` or `+-500 dps`.
-3. Calibrate gyro bias while the device is stationary.
-4. Stream timestamped samples as CSV over USB serial or Bluetooth UART.
-
-## Development
-
-Run tests:
-
+### Dev
 ```bash
 pytest
-```
-
-Format and lint:
-
-```bash
 ruff check src tests
-ruff format src tests
-```
-
-Type check:
-
-```bash
 mypy src
 ```
 
+## Environment variables
+None.
+
+## Contributing
+1. Fork the repo and create a branch: `git checkout -b feature/your-change`
+2. Commit using [Conventional Commits](https://www.conventionalcommits.org/) (`feat: …`, `fix: …`)
+3. Push and open a pull request against `main`
+
+## License
+No license file yet. Add one (MIT is a common choice) via **Add file → Create new file → `LICENSE` → Choose a license template**, then update this section.
+
+> Tip: set `authors` in `pyproject.toml` to your name (it currently says "IMU Tracker").
